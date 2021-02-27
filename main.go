@@ -48,15 +48,17 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 
 	for _, event := range events {
 		if event.Type == linebot.EventTypeMessage {
+			sourceUser, _ := bot.GetProfile(event.Source.UserID).Do()
 			switch message := event.Message.(type) {
 			case *linebot.TextMessage:
 				quota, err := bot.GetMessageQuota().Do()
 				if err != nil {
 					log.Println("Quota err:", err)
 				}
-				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.ID+":"+message.Text+" OK! remain message:"+strconv.FormatInt(quota.Value, 10))).Do(); err != nil {
+				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("Sent by:"+sourceUser.DisplayName+"\n message: "+message.Text)).Do(); err != nil {
 					log.Print(err)
 				}
+				log.Println("Quota left: " + strconv.FormatInt(quota.Value, 10))
 			}
 		}
 	}
