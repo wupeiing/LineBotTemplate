@@ -59,6 +59,15 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 					log.Print(err)
 				}
 				log.Println("Quota left: " + strconv.FormatInt(quota.Value, 10))
+			case *linebot.LocationMessage:
+				quota, err := bot.GetMessageQuota().Do()
+				if err != nil {
+					log.Println("Quota err:", err)
+				}
+				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("Sent by:"+sourceUser.DisplayName+"\n Location: "+message.Address)).Do(); err != nil {
+					log.Print(err)
+				}
+				log.Println("Quota left: " + strconv.FormatInt(quota.Value, 10))
 			}
 		}
 	}
